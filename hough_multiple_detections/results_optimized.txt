@@ -1,0 +1,107 @@
+Improved _optimized_: Starting on P1020171.jpg (N_theta = 478, N_rho = 239)
+Found 3514 edge pixels (out of 63245)
+Start of line search 1
+Main loop took 13.18 seconds
+Starting extra loops
+End of extra loops (1.87 seconds)
+End of line search 1 (15.05 seconds)
+Start of line search 2
+Main loop took 10.69 seconds
+Starting extra loops
+End of extra loops (1.93 seconds)
+End of line search 2 (12.62 seconds)
+Start of line search 3
+Main loop took 9.86 seconds
+Starting extra loops
+End of extra loops (1.01 seconds)
+End of line search 3 (10.87 seconds)
+
+Improved _optimized_: Starting on 1.jpg (N_theta = 802, N_rho = 401)
+Found 13136 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 82.20 seconds
+Starting extra loops
+End of extra loops (4.90 seconds)
+End of line search 1 (87.10 seconds)
+Start of line search 2
+Main loop took 69.30 seconds
+Starting extra loops
+End of extra loops (4.18 seconds)
+End of line search 2 (73.48 seconds)
+Start of line search 3
+Main loop took 65.33 seconds
+Starting extra loops
+End of extra loops (5.29 seconds)
+End of line search 3 (70.65 seconds)
+
+Improved _optimized_: Starting on 2.jpg (N_theta = 802, N_rho = 401)
+Found 13497 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 83.93 seconds
+Starting extra loops
+End of extra loops (6.13 seconds)
+End of line search 1 (90.06 seconds)
+Start of line search 2
+Main loop took 65.61 seconds
+Starting extra loops
+End of extra loops (4.79 seconds)
+End of line search 2 (70.40 seconds)
+Start of line search 3
+Main loop took 63.24 seconds
+Starting extra loops
+End of extra loops (4.54 seconds)
+End of line search 3 (67.78 seconds)
+
+Improved _optimized_: Starting on 3.jpg (N_theta = 802, N_rho = 401)
+Found 16379 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 101.23 seconds
+Starting extra loops
+End of extra loops (5.68 seconds)
+End of line search 1 (106.91 seconds)
+Start of line search 2
+Main loop took 79.14 seconds
+Starting extra loops
+End of extra loops (5.40 seconds)
+End of line search 2 (84.54 seconds)
+Start of line search 3
+Main loop took 79.72 seconds
+Starting extra loops
+End of extra loops (3.95 seconds)
+End of line search 3 (83.66 seconds)
+
+Improved _optimized_: Starting on 4.jpg (N_theta = 802, N_rho = 401)
+Found 12307 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 75.64 seconds
+Starting extra loops
+End of extra loops (5.46 seconds)
+End of line search 1 (81.10 seconds)
+Start of line search 2
+Main loop took 61.45 seconds
+Starting extra loops
+End of extra loops (4.79 seconds)
+End of line search 2 (66.24 seconds)
+Start of line search 3
+Main loop took 59.69 seconds
+Starting extra loops
+End of extra loops (6.80 seconds)
+End of line search 3 (66.49 seconds)
+
+Improved _optimized_: Starting on 5.jpg (N_theta = 802, N_rho = 401)
+Found 11177 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 68.98 seconds
+Starting extra loops
+End of extra loops (4.77 seconds)
+End of line search 1 (73.76 seconds)
+Start of line search 2
+Main loop took 49.59 seconds
+Starting extra loops
+End of extra loops (3.67 seconds)
+End of line search 2 (53.26 seconds)
+Start of line search 3
+Main loop took 50.33 seconds
+Starting extra loops
+End of extra loops (5.01 seconds)
+End of line search 3 (55.33 seconds)

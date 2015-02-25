@@ -1,0 +1,107 @@
+Improved _ with gradient optimized_: Starting on P1020171.jpg (N_theta = 478, N_rho = 239)
+Found 3514 edge pixels (out of 63245)
+Start of line search 1
+Main loop took 4.51 seconds
+Starting extra loops
+End of extra loops (1.54 seconds)
+End of line search 1 (6.05 seconds)
+Start of line search 2
+Main loop took 3.21 seconds
+Starting extra loops
+End of extra loops (1.03 seconds)
+End of line search 2 (4.24 seconds)
+Start of line search 3
+Main loop took 2.87 seconds
+Starting extra loops
+End of extra loops (0.95 seconds)
+End of line search 3 (3.82 seconds)
+
+Improved _ with gradient optimized_: Starting on 1.jpg (N_theta = 802, N_rho = 401)
+Found 13136 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 23.43 seconds
+Starting extra loops
+End of extra loops (5.04 seconds)
+End of line search 1 (28.47 seconds)
+Start of line search 2
+Main loop took 20.17 seconds
+Starting extra loops
+End of extra loops (3.87 seconds)
+End of line search 2 (24.04 seconds)
+Start of line search 3
+Main loop took 19.64 seconds
+Starting extra loops
+End of extra loops (3.12 seconds)
+End of line search 3 (22.76 seconds)
+
+Improved _ with gradient optimized_: Starting on 2.jpg (N_theta = 802, N_rho = 401)
+Found 13497 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 23.49 seconds
+Starting extra loops
+End of extra loops (4.82 seconds)
+End of line search 1 (28.31 seconds)
+Start of line search 2
+Main loop took 19.66 seconds
+Starting extra loops
+End of extra loops (5.48 seconds)
+End of line search 2 (25.13 seconds)
+Start of line search 3
+Main loop took 20.01 seconds
+Starting extra loops
+End of extra loops (2.28 seconds)
+End of line search 3 (22.29 seconds)
+
+Improved _ with gradient optimized_: Starting on 3.jpg (N_theta = 802, N_rho = 401)
+Found 16379 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 28.78 seconds
+Starting extra loops
+End of extra loops (6.32 seconds)
+End of line search 1 (35.10 seconds)
+Start of line search 2
+Main loop took 24.82 seconds
+Starting extra loops
+End of extra loops (5.16 seconds)
+End of line search 2 (29.98 seconds)
+Start of line search 3
+Main loop took 24.60 seconds
+Starting extra loops
+End of extra loops (3.54 seconds)
+End of line search 3 (28.14 seconds)
+
+Improved _ with gradient optimized_: Starting on 4.jpg (N_theta = 802, N_rho = 401)
+Found 12307 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 21.51 seconds
+Starting extra loops
+End of extra loops (6.35 seconds)
+End of line search 1 (27.86 seconds)
+Start of line search 2
+Main loop took 18.72 seconds
+Starting extra loops
+End of extra loops (3.03 seconds)
+End of line search 2 (21.75 seconds)
+Start of line search 3
+Main loop took 16.69 seconds
+Starting extra loops
+End of extra loops (2.45 seconds)
+End of line search 3 (19.14 seconds)
+
+Improved _ with gradient optimized_: Starting on 5.jpg (N_theta = 802, N_rho = 401)
+Found 11177 edge pixels (out of 307200)
+Start of line search 1
+Main loop took 19.56 seconds
+Starting extra loops
+End of extra loops (2.06 seconds)
+End of line search 1 (21.62 seconds)
+Start of line search 2
+Main loop took 14.48 seconds
+Starting extra loops
+End of extra loops (3.23 seconds)
+End of line search 2 (17.71 seconds)
+Start of line search 3
+Main loop took 16.08 seconds
+Starting extra loops
+End of extra loops (3.37 seconds)
+End of line search 3 (19.45 seconds)

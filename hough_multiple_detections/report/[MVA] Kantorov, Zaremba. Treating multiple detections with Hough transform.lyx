@@ -1,0 +1,1849 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{caption}
+\captionsetup[figure]{margin=10pt,font=normalsize,labelfont=bf, justification=raggedright} 
+\captionsetup[table]{margin=10pt,font=normalsize,labelfont=bf, justification=raggedright}
+\captionsetup[lstlisting]{margin=10pt,font=normalsize,labelfont=bf, justification=raggedright} 
+\usepackage{url}
+\usepackage [numbers]{natbib}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine natbib_authoryear
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Treating multiple detections with Hough transform
+\end_layout
+
+\begin_layout Author
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+Vadim Kantorov
+\backslash
+
+\backslash
+ École Normale Supérieure de Cachan 
+\backslash
+
+\backslash
+ {
+\backslash
+tt
+\backslash
+small vadim.kantorov@gmail.com} 
+\backslash
+and Wojciech Zaremba
+\backslash
+
+\backslash
+ École Polytechnique
+\backslash
+
+\backslash
+ {
+\backslash
+tt
+\backslash
+small woj.zaremba@gmail.com}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This paper describes enhancement to the Hough transform based on a paper
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+cite{10.1109/CVPR.2010.5539905}
+\end_layout
+
+\end_inset
+
+.
+ The Hough transform is a classical idea that allows to detect low-dimensional
+ structures on an image.
+ A short description follows.
+ The first step is to parameterize a desired object (line, circle, pedestrian
+ etc) with a small number of parameters (2 for line, 3 for circle, 3 for
+ pedestrian).
+ The conventional parameterization for lines is 
+\begin_inset Formula $\left(r,\varphi\right)$
+\end_inset
+
+ where 
+\begin_inset Formula $r\in\left[-R,R\right],\varphi\in[0,\pi)$
+\end_inset
+
+, the line equation being 
+\begin_inset Formula $r=x\cos\varphi+y\sin\varphi$
+\end_inset
+
+ (illustrated in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Line-parameterization"
+
+\end_inset
+
+).
+ This parameter space is often referred as a 
+\shape italic
+hypothesis space
+\shape default
+ or 
+\shape italic
+voting space
+\shape default
+.
+ A single 
+\shape italic
+hypothesis
+\shape default
+ suggests an object is present in the image at a fixed position with fixed
+ geometric parameters.
+ An example of two lines and their corresponding points in the hypothesis
+ space is demonstrated in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Lines-in-the"
+
+\end_inset
+
+.
+ The second step is to break down the image in a set of voting elements,
+ in the case of line detection, it is simply all pixels that belong to some
+ edge in the image.
+ The third step is to ask voting elements to vote for all hypotheses (object
+ dispositions) they might belong to.
+ For line detection, that is a pixel votes for all lines that pass through
+ it.
+ The fourth and last step is to identify maxima in the voting space which
+ correspond to the most probable object positions.
+ An example output of Hough transform for line detection is presented in
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Example-output-of"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename param_explanation.gif
+	width 5cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Line parameterization
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Line-parameterization"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename simple.png
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Lines in the primal space and in the hypothesis space
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Lines-in-the"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Classical Hough transform explanation, pictures taken from
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+ 
+\backslash
+cite{hough_wiki}
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 1.png
+	lyxscale 40
+	width 5cm
+	height 3cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename lines_on_edge_space.png
+	lyxscale 40
+	width 5cm
+	height 3cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename lines_on_image_space.png
+	lyxscale 40
+	width 5cm
+	height 3cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Example output of Hough straight line detection
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Example-output-of"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+However, the last step usually involves different heuristics (like non-maxima
+ suppression) to make out the most significant peaks in the hypothesis space.
+ These heuristics often involve non-natural parameters and need to be tweaked
+ for specific conditions.
+ Further, conventional non-maxima suppression often fails to separate close
+ detections, the dominant one may suppress the other close peaks.
+ In the pursuit for easier treatment of multiple detections we follow 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+cite{10.1109/CVPR.2010.5539905}
+\end_layout
+
+\end_inset
+
+ which presents a probabilistic interpretation of the Hough transform and
+ allows to handle multiple close detections in a straight-forward way without
+ falling back to heuristics.
+\end_layout
+
+\begin_layout Section
+Enhanced Hough transform - description of a probabilistic framework
+\end_layout
+
+\begin_layout Standard
+Classical Hough transform assumes independence between votes.
+ This assumption is quite crude, because it is very likely that adjacent
+ elements in the picture (patches, or edge pixels) support the same hypothesis
+ (or belong to clutter).
+ Model proposed in paper 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+cite{10.1109/CVPR.2010.5539905}
+\end_layout
+
+\end_inset
+
+ tries to alleviate this issue.
+ We describe here a general probabilistic framework and in the following
+ sections, we narrow our consideration to the edge detection problem.
+\end_layout
+
+\begin_layout Standard
+Let's consider hypothesis space
+\begin_inset Formula $H$
+\end_inset
+
+ and 
+\begin_inset Formula $N$
+\end_inset
+
+ number of voters.
+ Every element 
+\begin_inset Formula $h$
+\end_inset
+
+ belongs to hypothesis space 
+\begin_inset Formula $H$
+\end_inset
+
+ and corresponds to object on a image i.e.
+ hypothesis 
+\begin_inset Formula $h_{1}$
+\end_inset
+
+states that there is visible pedestrian in a box 
+\begin_inset Formula $(1,1),(5,5)$
+\end_inset
+
+ on the picture, hypothesis 
+\begin_inset Formula $h_{2}$
+\end_inset
+
+ states that there is visible pedestrian in a box 
+\begin_inset Formula $(3,3),(7,7)$
+\end_inset
+
+ on the picture and so on.
+ Our hypothesis space contains one special hypothesis, which doesn't correspond
+ to any object - 
+\begin_inset Formula $0$
+\end_inset
+
+ hypothesis, which states for noise.
+ Voters are usually patches on the picture in case of pedestrian detector
+ or edge pixels in case of edge detector, which vote for hypotheses i.e.
+ patch containing eye vote for hypothesis which states that there is pedestrian
+ close to place of this eye.
+ Voters might vote for multiple hypotheses.
+ Let's mark as 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ a random variable related with 
+\begin_inset Formula $i$
+\end_inset
+
+-th voter.
+ 
+\begin_inset Formula $p(x_{i}=h|I_{i})$
+\end_inset
+
+ states for probability that 
+\begin_inset Formula $i$
+\end_inset
+
+-th voter votes for hypothesis 
+\begin_inset Formula $h$
+\end_inset
+
+ based on appearance of voter 
+\begin_inset Formula $I_{i}$
+\end_inset
+
+.
+ 
+\begin_inset Formula $p(x_{i}=0|I_{i})$
+\end_inset
+
+ is a probability that object is part of background clutter.
+ We introduce a binary random variable 
+\begin_inset Formula $y_{h}$
+\end_inset
+
+ (indexed by hypothesis, except 
+\begin_inset Formula $0$
+\end_inset
+
+-hypothesis) which takes 
+\begin_inset Formula $1$
+\end_inset
+
+ when the hypothesis is valid and 
+\begin_inset Formula $0$
+\end_inset
+
+ when it is not.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{y}$
+\end_inset
+
+ are vectors of a random variables 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $\mathbf{x}=\{x_{i}\}_{i\in N}$
+\end_inset
+
+ 
+\begin_inset Formula $\mathbf{y}=\{y_{h}\}_{h\in H}$
+\end_inset
+
+ and 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mathbf{I}$
+\end_inset
+
+ is a vector of 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+edge pixels (or patches) 
+\begin_inset Formula $\mathbf{I}=\{I_{i}\}_{i\in N}$
+\end_inset
+
+ .
+ 
+\begin_inset Formula $I_{i}$
+\end_inset
+
+ can be considered as voters or as appearance related to them like edge
+ pixel or patch.
+ Our goal is to find 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mathbf{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{y}$
+\end_inset
+
+, which maximize
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\begin_inset Formula $p(\mathbf{x},\mathbf{y|I)}$
+\end_inset
+
+.
+ First from Bayes rule follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\mathbf{x},\mathbf{y|I)\propto p(\mathbf{I|x},\mathbf{y)p(\mathbf{x},\mathbf{y)}}}\label{eq:bayes}
+\end{equation}
+
+\end_inset
+
+Further we first analyze 
+\begin_inset Formula $p(\mathbf{I|x},\mathbf{y)}$
+\end_inset
+
+ term.
+ In order to compute it there are needed some simplifications.
+ Assume that distributions of appearance of voting elements 
+\begin_inset Formula $I_{i}$
+\end_inset
+
+ are independent :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\mathbf{I|x},\mathbf{y)}=\prod p(I_{i}|\mathbf{x,y})
+\]
+
+\end_inset
+
+and that 
+\begin_inset Formula $I_{i}$
+\end_inset
+
+ is only dependent on vote 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ and conditionally independent on 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mathbf{y}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\mathbf{I|x},\mathbf{y)}=\prod p(I_{i}|x_{i})\label{eq:simplification}
+\end{equation}
+
+\end_inset
+
+From 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:bayes"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:simplification"
+
+\end_inset
+
+ and from Bayes rule applied to 
+\begin_inset Formula $p(I_{i}|x_{i})$
+\end_inset
+
+ follows :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\mathbf{x},\mathbf{y|I)\propto\prod}p(x_{i}|I_{i})\frac{p(\mathbf{x,y})}{\prod p(x_{i})}\label{eq:pxyI}
+\end{equation}
+
+\end_inset
+
+Assume that 
+\begin_inset Formula $p(\mathbf{x},\mathbf{y)}$
+\end_inset
+
+ is only positive if all hypothesis 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ are certified by 
+\begin_inset Formula $\mathbf{y}$
+\end_inset
+
+ or formally 
+\begin_inset Formula $y_{h}=1$
+\end_inset
+
+ for every 
+\begin_inset Formula $h=x_{i}$
+\end_inset
+
+ for 
+\begin_inset Formula $i\in N$
+\end_inset
+
+.
+ Lets call all such pairs of 
+\begin_inset Formula $(\mathbf{x,}\mathbf{y})$
+\end_inset
+
+ valid pairs.
+ Author describes 
+\begin_inset Formula $p(\mathbf{x},\mathbf{y)}$
+\end_inset
+
+ as :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\mathbf{x},\mathbf{y)\propto p(y)\prod p(x_{i})\text{ for }(x,y)\text{ valid and }p(\mathbf{x},\mathbf{y)}=0}\text{ for}(\mathbf{x,}\mathbf{y})\text{ invalid}\label{eq:pxy}
+\end{equation}
+
+\end_inset
+
+For invalid 
+\begin_inset Formula $(\mathbf{x,y})$
+\end_inset
+
+ let assign probability 
+\begin_inset Formula $0$
+\end_inset
+
+.
+ Further assume that considered 
+\begin_inset Formula $(\mathbf{x,y})$
+\end_inset
+
+ are valid.
+ Our model should encourage to explain hypothesis with as few objects as
+ it is possible: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\mathbf{y})\propto\exp(-\text{λ}\sum y_{h})\label{eq:py}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "eq:pxy-1"
+
+\end_inset
+
+together with 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:pxy"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:py"
+
+\end_inset
+
+ gives :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\mathbf{x,y})\propto\prod p(x_{i})\prod\exp(-\text{λ}y_{h})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From above equation and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:pxyI"
+
+\end_inset
+
+ obtains:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(\mathbf{x,y|I})\propto\prod p(x_{i}|I_{i})\prod\exp(-\text{λ}y_{h})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In order to maximize it, we consider 
+\begin_inset Formula $log$
+\end_inset
+
+ of above equation.
+ Maximization function 
+\begin_inset Formula $E(\mathbf{x,y})$
+\end_inset
+
+ is following :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+E(\mathbf{x,y})=\sum\log(p(x_{i}|I_{i})-\text{λ}\sum y_{h}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This formula allows us to define greedy algorithm:
+\end_layout
+
+\begin_layout Enumerate
+Assign 0 to all 
+\begin_inset Formula $y_{h}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Take 
+\begin_inset Formula $y_{h}$
+\end_inset
+
+ which is equal to zero and find all 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+such that changing their hypothesis to 
+\begin_inset Formula $h$
+\end_inset
+
+ is beneficial (
+\begin_inset Formula $\log(p(x_{i}=previoush))-\log(p(x_{i}=previoush))$
+\end_inset
+
+is positive).
+\end_layout
+
+\begin_layout Enumerate
+Set 
+\begin_inset Formula $y_{h}$
+\end_inset
+
+ to 
+\begin_inset Formula $1$
+\end_inset
+
+ for such 
+\begin_inset Formula $y_{h}$
+\end_inset
+
+ that sum of 
+\begin_inset Formula $\log(p(x_{i}=h_{previous}))-\log(p(x_{i}=h_{previous}))$
+\end_inset
+
+ (once it is positive) is maximum and is bigger then λ.
+ In order to increase value of 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $E(\mathbf{x,y})$
+\end_inset
+
+ this sum has to be bigger then term 
+\begin_inset Formula $λy_{h}$
+\end_inset
+
+.
+ If the computed sum is not bigger than 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+λ
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ then terminate algorithm.
+\end_layout
+
+\begin_layout Enumerate
+Repeat procedure from point 2.
+\end_layout
+
+\begin_layout Section
+Implementation details
+\end_layout
+
+\begin_layout Standard
+This section focus on implementation details regarding the edge detection
+ algorithm.
+ Further optimizations assumes that we deal with edges.
+ The time complexity of the non-optimized version is 
+\begin_inset Formula 
+\[
+O\left(\#voting\_elements\cdot\#examined\_hypotheses\_per\_element\right)
+\]
+
+\end_inset
+
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "alg:pseudocode"
+
+\end_inset
+
+ gives overview pseudo-code of the enhanced Hough transform algorithm.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float algorithm
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset listings
+lstparams "backgroundcolor={\color{white}},basicstyle={\footnotesize},breakatwhitespace=false,breaklines=true,captionpos=b,escapeinside={@}{@},frame=single,label={lst:code},language=Matlab,numbers=left,numbersep=5pt,numberstyle={\footnotesize},showstringspaces=false,showtabs=false,stepnumber=1,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+%iterate over this code to obtain multiple detections
+\end_layout
+
+\begin_layout Plain Layout
+
+M = zeros(Max_theta, Max_row) %M is hypothesis space
+\end_layout
+
+\begin_layout Plain Layout
+
+%compute up hypotheses
+\end_layout
+
+\begin_layout Plain Layout
+
+for x = 1:width
+\end_layout
+
+\begin_layout Plain Layout
+
+  for y = 1:height
+\end_layout
+
+\begin_layout Plain Layout
+
+    for theta = 0:Max_theta
+\end_layout
+
+\begin_layout Plain Layout
+
+      rho = computeRow(x, y, theta)
+\end_layout
+
+\begin_layout Plain Layout
+
+      current = vote(x, y, theta, rho)
+\end_layout
+
+\begin_layout Plain Layout
+
+      previous = vote(x, y, X_theta(x,y), X_rho(x,y)) %X contains votes
+\end_layout
+
+\begin_layout Plain Layout
+
+      if current > previous
+\end_layout
+
+\begin_layout Plain Layout
+
+        M(theta, rho) = M(theta, rho) + current - previous
+\end_layout
+
+\begin_layout Plain Layout
+
+      end  
+\end_layout
+
+\begin_layout Plain Layout
+
+  end 
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\begin_layout Plain Layout
+
+%find most likely hypothesis (with highest value in hypothesis space M)
+\end_layout
+
+\begin_layout Plain Layout
+
+bestTheta = ...
+\end_layout
+
+\begin_layout Plain Layout
+
+bestRho = ....
+\end_layout
+
+\begin_layout Plain Layout
+
+%update X, which supported bestTheta, bestRho to vote for bestTheta and
+ bestRho
+\end_layout
+
+\begin_layout Plain Layout
+
+for x = 1:width
+\end_layout
+
+\begin_layout Plain Layout
+
+  y = ...%compute out of x, bestTheta, bestRho
+\end_layout
+
+\begin_layout Plain Layout
+
+  current = vote(x, y, bestTheta, bestRho)
+\end_layout
+
+\begin_layout Plain Layout
+
+  previous = vote(x, y, X_theta(x,y), X_rho(x,y)) %X contains votes
+\end_layout
+
+\begin_layout Plain Layout
+
+  if current > previous
+\end_layout
+
+\begin_layout Plain Layout
+
+    X(x, y) = (bestTheta, bestRho)
+\end_layout
+
+\begin_layout Plain Layout
+
+  end
+\end_layout
+
+\begin_layout Plain Layout
+
+end
+\end_layout
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Pseudo-code - greedy algorithm 
+\begin_inset CommandInset label
+LatexCommand label
+name "alg:pseudocode"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Using gradients to reduce number of examined angles
+\end_layout
+
+\begin_layout Standard
+In the introduction we put that a pixel (a voting element) votes for every
+ line (hypothesis) that passes through it.
+ This optimization reduces the number of hypothesis an element votes for
+ based on local appearance.
+ For the line detection case it means that we vote only for the lines that
+ are orthogonal to local gradient direction.
+ Basically, we just vote in a smarter way and are supporting only most likely
+ hypotheses.
+ We implement this optimization by precomputing local gradient and its respectiv
+e 
+\begin_inset Formula $\varphi$
+\end_inset
+
+-discretization at every pixel.
+ This optimization did help noticeably and speed up the processing time
+ by a factor of two.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Gradient-optimization-in"
+
+\end_inset
+
+ presents the optimization effect, one can see that there are less votes
+ when the optimization is enabled.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename voting_space_no_gradient_optimization.png
+	display false
+	width 5cm
+	height 5cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Hypothesis space without gradient optimization
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename voting_space_with_gradient_optimization.png
+	display false
+	width 5cm
+	height 5cm
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Hypothesis space with gradient optimization - much less hypotheses
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Gradient optimization in the voting space
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Gradient-optimization-in"
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Reusing computed votes
+\end_layout
+
+\begin_layout Standard
+Reusing computed votes is a general optimization which might be used to
+ speed up any multiple detections.
+ It caches support of hypotheses and this way it avoids recomputing them
+ during consecutive iterations.
+ As a use case we consider line detector to explain this optimization.
+\end_layout
+
+\begin_layout Standard
+Essentially every iteration is composed out of three parts :
+\end_layout
+
+\begin_layout Enumerate
+Computation of M (support of every hypothesis)
+\end_layout
+
+\begin_layout Enumerate
+Finding maximum value in M array (finding which hypothesis is most likely)
+\end_layout
+
+\begin_layout Enumerate
+Updating X to vote for a new hypothesis
+\end_layout
+
+\begin_layout Standard
+The first part of the algorithm is dependent on the vote updates from the
+ third part of algorithm, however for many hypotheses the likelihood value
+ in M stay the same among iterations.
+ Let's consider the situation from Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:caching"
+
+\end_inset
+
+.
+ Assume that during the first iteration the algorithm found a red line correspon
+ding to hypothesis 
+\begin_inset Formula $h_{1}$
+\end_inset
+
+.
+ It has to compute likelihood for every hypothesis among them for 
+\begin_inset Formula $h_{2}$
+\end_inset
+
+.
+ At the end of the first iteration in the third step the program assigns
+ some values in 
+\begin_inset Formula $X$
+\end_inset
+
+ to vote for 
+\begin_inset Formula $h_{1}$
+\end_inset
+
+.
+ Those are those elements in 
+\begin_inset Formula $X$
+\end_inset
+
+, which supports 
+\begin_inset Formula $h_{1}$
+\end_inset
+
+.
+ Those voters will never have influence on value of likelihood of hypothesis
+ 
+\begin_inset Formula $h_{2}$
+\end_inset
+
+ because corresponding lines are far from each other.
+ Based on this observation at the end of the third iteration we invalidate
+ hypotheses, which can be influenced by new values in 
+\begin_inset Formula $X$
+\end_inset
+
+.
+ Those are these hypotheses, which correspond to lines crossing with the
+ line corresponding to hypothesis 
+\begin_inset Formula $h_{1}$
+\end_inset
+
+.
+ Then in the first step we compute likelihood only for hypothesis, which
+ were invalidated.
+ 
+\end_layout
+
+\begin_layout Standard
+It is worth to notice that finding small line segments invalidates small
+ number of hypothesis, what makes next iterations even faster.
+ This observation is general.
+ Next iteration after choosing hypothesis which do not share many voters
+ with other hypotheses is much faster.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename caching.png
+	width 12cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:caching"
+
+\end_inset
+
+Caching - hypothesis 
+\begin_inset Formula $h_{1}$
+\end_inset
+
+ do not share voters with 
+\begin_inset Formula $h_{2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+MATLAB caveats
+\end_layout
+
+\begin_layout Standard
+We chose MATLAB 2010b as our implementation language which led to quite
+ concise code and numerous unexpected problems.
+ Originally our code would take almost 50 seconds to run on an averaged
+ sized picture (about 600x800).
+ Caching sine and cosine values did improve the time as we expected.
+ What was unexpected is that we were able to rise the speed by a factor
+ of three by simply manually in-lining short functions (MATLAB 
+\begin_inset Quotes eld
+\end_inset
+
+in-line expressions
+\begin_inset Quotes erd
+\end_inset
+
+ did not help) and replacing the 
+\begin_inset Formula $\max\left(0,1-x\right)$
+\end_inset
+
+ loss function by the Gaussian.
+ The fact that this last change helped so much was stunning and we could
+ not find a plausible explanation.
+ The take home message is MATLAB (at least 2010b) fails at even simple in-line
+ optimization and that CPU-bound algorithms should be written in a more
+ predictable language.
+\end_layout
+
+\begin_layout Section
+Experimental setup and evaluation
+\end_layout
+
+\begin_layout Standard
+The original work 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+cite{10.1109/CVPR.2010.5539905}
+\end_layout
+
+\end_inset
+
+ runs formal evaluation for line detection on images from the 
+\begin_inset CommandInset href
+LatexCommand href
+name "YorkUrbanDB"
+target "http://www.elderlab.yorku.ca/YorkUrbanDB/"
+
+\end_inset
+
+ (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+cite{york_urban}
+\end_layout
+
+\end_inset
+
+) dataset and for pedestrian detection.
+ We do not go that far and do not calculate any formal performance metric.
+ However, we do present the visual results and running time for a few pictures
+ from YorkUrbanDB with classical and enhanced Hough transform versions (both
+ coded in MATLAB).
+ The algorithms were run with 
+\begin_inset Formula $N_{\theta}=800$
+\end_inset
+
+ with 3 iterations on a desktop with Intel Core i7-2600, 3.4GHz, RAM 12Gb.
+ The plot 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Performance-plot"
+
+\end_inset
+
+ clearly shows that these two optimizations and careful MATLAB coding improved
+ the performance drastically.
+ In particular, we observe that votes caching optimization causes time to
+ decrease with the number of iterations.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Consecutive-treatment-of"
+
+\end_inset
+
+ shows how the enhanced algorithm discovers lines one by one.
+ One can notice that the brightest point of the hypothesis space disappears,
+ and the next most probable hypothesis becomes brighter (relatively to other
+ hypotheses).
+ The performance plot is presented in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Performance-plot"
+
+\end_inset
+
+, the linear dependency of time on angular space size is actually observed.
+ Entire code and test images is available on Github under url: 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/vadimkantorov/advancedcv-hough
+\end_layout
+
+\end_inset
+
+, the installation instructions are placed in 
+\begin_inset CommandInset href
+LatexCommand href
+name "README.txt"
+target "https://github.com/vadimkantorov/advancedcv-hough/blob/master/README.txt"
+
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename perfplot.png
+	scale 40
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Running time of different variants with respect to angular space size 
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Performance-plot"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 1.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 2.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 3.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 4.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 5.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename no_gradient_voting_space_ 6.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename image_space_01.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename image_space_02.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename image_space_03.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename image_space_04.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename image_space_05.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename image_space_06.png
+	lyxscale 20
+	scale 15
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Consecutive treatment of multiple detections
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Consecutive-treatment-of"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+Enhanced Hough transform proposed in referred paper is very promising due
+ to same complexity as classical Hough transform.
+ This approach allows to give more accurate results without performance
+ penalty.
+ Proposed solution is natural extension of the Hough transform.
+ We strongly believe that this approach will become more popular in Computer
+ Vision in following years.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintAll"
+bibfiles "CVPR.2010.5539905,CVPR.2010"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
